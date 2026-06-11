@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Narak QR - เครื่องมือสร้างคิวอาร์โค้ดสไตล์กลมมน น่ารัก ๆ 💖</title>
+  
+  <!-- Google Fonts: Outfit (rounded, modern) & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- QR Code Styling Library -->
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Animated Background Blobs -->
+  <div class="background-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">💖</div>
+        <div class="logo-text">
+          <h1>Narak QR</h1>
+          <p>เครื่องมือสร้างคิวอาร์โค้ดสุดน่ารัก สไตล์กลมมน</p>
+        </div>
+      </div>
+      
+      <!-- Theme Switcher -->
+      <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Theme">
+        <i data-lucide="sun" class="sun-icon"></i>
+        <i data-lucide="moon" class="moon-icon"></i>
+      </button>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="workspace-grid">
+      
+      <!-- Left Panel: Configuration Options -->
+      <section class="config-panel glass-panel">
+        
+        <!-- Section 1: Data Input -->
+        <div class="config-section">
+          <h2 class="section-title">
+            <span class="step-num">1</span>
+            <i data-lucide="link"></i>
+            ข้อมูลคิวอาร์โค้ด (Link / Text)
+          </h2>
+          <div class="input-group">
+            <input type="text" id="qrText" value="https://google.com" placeholder="ใส่ลิงก์หรือข้อความตรงนี้ได้เลย..." autocomplete="off">
+            <button class="clear-btn" id="clearTextBtn" title="Clear text">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 2: Shapes & Style -->
+        <div class="config-section">
+          <h2 class="section-title">
+            <span class="step-num">2</span>
+            <i data-lucide="shapes"></i>
+            เลือกสไตล์และรูปทรง (Shapes)
+          </h2>
+          
+          <!-- Modules Style (Dots) -->
+          <div class="setting-row">
+            <label class="setting-label">สไตล์ของโมดูล (Dots Style)</label>
+            <div class="card-selector" id="dotTypeContainer">
+              <div class="selector-card active" data-value="extra-rounded">
+                <div class="card-icon extra-rounded-preview"></div>
+                <span>กลมมนพิเศษ</span>
+              </div>
+              <div class="selector-card" data-value="rounded">
+                <div class="card-icon rounded-preview"></div>
+                <span>กลมมน</span>
+              </div>
+              <div class="selector-card" data-value="dots">
+                <div class="card-icon dots-preview"></div>
+                <span>วงกลม</span>
+              </div>
+              <div class="selector-card" data-value="classy-rounded">
+                <div class="card-icon classy-rounded-preview"></div>
+                <span>เรียบหรูมน</span>
+              </div>
+              <div class="selector-card" data-value="classy">
+                <div class="card-icon classy-preview"></div>
+                <span>เรียบหรู</span>
+              </div>
+              <div class="selector-card" data-value="square">
+                <div class="card-icon square-preview"></div>
+                <span>สี่เหลี่ยม</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Corners Eye Outer Frame -->
+          <div class="setting-row-grid">
+            <div class="setting-row">
+              <label class="setting-label">กรอบมุมคิวอาร์ (Corner Squares)</label>
+              <select id="cornerSquareType" class="cute-select">
+                <option value="extra-rounded" selected>กลมมนพิเศษ (Extra Rounded)</option>
+                <option value="dot">วงกลม (Circle)</option>
+                <option value="square">สี่เหลี่ยม (Square)</option>
+                <option value="classy">เรียบหรู (Classy)</option>
+              </select>
+            </div>
+            
+            <!-- Corners Eye Inner Dot -->
+            <div class="setting-row">
+              <label class="setting-label">จุดในกรอบมุม (Corner Dots)</label>
+              <select id="cornerDotType" class="cute-select">
+                <option value="dot" selected>วงกลม (Circle)</option>
+                <option value="square">สี่เหลี่ยม (Square)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Colors & Gradients -->
+        <div class="config-section">
+          <h2 class="section-title">
+            <span class="step-num">3</span>
+            <i data-lucide="palette"></i>
+            ตกแต่งสีสัน (Colors)
+          </h2>
+
+          <div class="setting-row">
+            <label class="setting-label">รูปแบบสี</label>
+            <div class="tab-selector" id="colorModeSelector">
+              <button class="tab-btn active" data-value="single">สีเดี่ยว</button>
+              <button class="tab-btn" data-value="gradient">ไล่ระดับสี (Gradient)</button>
+            </div>
+          </div>
+
+          <!-- Single Color Input -->
+          <div class="color-mode-panel active" id="singleColorPanel">
+            <div class="color-picker-wrapper">
+              <label class="setting-label sub-label">สีหลักของคิวอาร์</label>
+              <div class="picker-container">
+                <input type="color" id="qrColorSingle" value="#2b2d42">
+                <input type="text" id="qrColorSingleHex" class="hex-input" value="#2b2d42">
+              </div>
+            </div>
+          </div>
+
+          <!-- Gradient Inputs -->
+          <div class="color-mode-panel" id="gradientColorPanel">
+            <div class="setting-row-grid">
+              <div class="color-picker-wrapper">
+                <label class="setting-label sub-label">สีเริ่มต้น (Start)</label>
+                <div class="picker-container">
+                  <input type="color" id="qrColorGradStart" value="#e9c46a">
+                  <input type="text" id="qrColorGradStartHex" class="hex-input" value="#e9c46a">
+                </div>
+              </div>
+              <div class="color-picker-wrapper">
+                <label class="setting-label sub-label">สีสิ้นสุด (End)</label>
+                <div class="picker-container">
+                  <input type="color" id="qrColorGradEnd" value="#f4a261">
+                  <input type="text" id="qrColorGradEndHex" class="hex-input" value="#f4a261">
+                </div>
+              </div>
+            </div>
+            
+            <div class="setting-row-grid mt-2">
+              <div class="setting-row">
+                <label class="setting-label sub-label">รูปแบบไล่สี</label>
+                <select id="gradientType" class="cute-select">
+                  <option value="linear" selected>เชิงเส้น (Linear)</option>
+                  <option value="radial">รัศมีวงกลม (Radial)</option>
+                </select>
+              </div>
+              <div class="setting-row" id="gradientRotationContainer">
+                <label class="setting-label sub-label">องศาความเอียง (องศา)</label>
+                <div class="range-with-val">
+                  <input type="range" id="gradientRotation" min="0" max="360" value="45">
+                  <span class="range-val" id="gradRotVal">45°</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Colors for Corners? -->
+          <div class="setting-row mt-3">
+            <label class="toggle-container">
+              <input type="checkbox" id="customCornerColors">
+              <span class="toggle-slider"></span>
+              <span class="setting-label inline-label">แยกสีส่วนหัวมุม (Custom Corner Colors)</span>
+            </label>
+          </div>
+
+          <div class="custom-corners-panel" id="customCornersPanel">
+            <div class="setting-row-grid">
+              <div class="color-picker-wrapper">
+                <label class="setting-label sub-label">รีกรอบนอกหัวมุม</label>
+                <div class="picker-container">
+                  <input type="color" id="cornerSquareColor" value="#e76f51">
+                  <input type="text" id="cornerSquareHex" class="hex-input" value="#e76f51">
+                </div>
+              </div>
+              <div class="color-picker-wrapper">
+                <label class="setting-label sub-label">สีจุดในหัวมุม</label>
+                <div class="picker-container">
+                  <input type="color" id="cornerDotColor" value="#2a9d8f">
+                  <input type="text" id="cornerDotHex" class="hex-input" value="#2a9d8f">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Background Color -->
+          <div class="setting-row mt-3 border-top pt-3">
+            <div class="setting-row-grid">
+              <div class="color-picker-wrapper">
+                <label class="setting-label sub-label">สีพื้นหลัง (Background)</label>
+                <div class="picker-container">
+                  <input type="color" id="qrBgColor" value="#ffffff">
+                  <input type="text" id="qrBgColorHex" class="hex-input" value="#ffffff">
+                </div>
+              </div>
+              <div class="setting-row justify-center-align">
+                <label class="toggle-container">
+                  <input type="checkbox" id="transparentBg">
+                  <span class="toggle-slider"></span>
+                  <span class="setting-label inline-label">พื้นหลังโปร่งใส</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Sticker / Logo -->
+        <div class="config-section">
+          <h2 class="section-title">
+            <span class="step-num">4</span>
+            <i data-lucide="sticker"></i>
+            สติกเกอร์น่ารักตรงกลาง (Center Logo)
+          </h2>
+          
+          <div class="setting-row">
+            <label class="setting-label">เลือกสติกเกอร์สำเร็จรูป</label>
+            <div class="sticker-grid" id="predefinedStickers">
+              <div class="sticker-card active" data-sticker="none">
+                <div class="sticker-preview">🚫</div>
+                <span>ไม่มี</span>
+              </div>
+              <div class="sticker-card" data-sticker="cat">
+                <div class="sticker-preview">🐱</div>
+                <span>น้องแมว</span>
+              </div>
+              <div class="sticker-card" data-sticker="heart">
+                <div class="sticker-preview">💖</div>
+                <span>หัวใจ</span>
+              </div>
+              <div class="sticker-card" data-sticker="star">
+                <div class="sticker-preview">⭐</div>
+                <span>ดวงดาว</span>
+              </div>
+              <div class="sticker-card" data-sticker="cloud">
+                <div class="sticker-preview">☁️</div>
+                <span>ก้อนเมฆ</span>
+              </div>
+              <div class="sticker-card" data-sticker="boba">
+                <div class="sticker-preview">🧋</div>
+                <span>ชานม</span>
+              </div>
+              <div class="sticker-card" data-sticker="bear">
+                <div class="sticker-preview">🧸</div>
+                <span>หมีน้อย</span>
+              </div>
+              <div class="sticker-card" data-sticker="sparkles">
+                <div class="sticker-preview">✨</div>
+                <span>วิบวับ</span>
+              </div>
+              <div class="sticker-card" data-sticker="music">
+                <div class="sticker-preview">🎵</div>
+                <span>เสียงเพลง</span>
+              </div>
+              <div class="sticker-card" data-sticker="shop">
+                <div class="sticker-preview">🛍️</div>
+                <span>ช้อปปิ้ง</span>
+              </div>
+              <div class="sticker-card" data-sticker="pin">
+                <div class="sticker-preview">📍</div>
+                <span>ปักหมุด</span>
+              </div>
+              <div class="sticker-card" data-sticker="sushi">
+                <div class="sticker-preview">🍣</div>
+                <span>ซูชิ</span>
+              </div>
+              <div class="sticker-card" data-sticker="coffee">
+                <div class="sticker-preview">☕</div>
+                <span>กาแฟ</span>
+              </div>
+              <div class="sticker-card" data-sticker="thaiarch">
+                <div class="sticker-preview">🏛️</div>
+                <span>สถาปัตยกรรม</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-row border-top pt-2 mt-2">
+            <label class="setting-label">หรือ อัปโหลดรูปภาพของคุณเอง</label>
+            <div class="upload-area" id="uploadArea">
+              <i data-lucide="upload-cloud"></i>
+              <p>ลากไฟล์รูปภาพมาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
+              <input type="file" id="customLogoInput" accept="image/*" class="file-input-hidden">
+            </div>
+            
+            <!-- File info if uploaded -->
+            <div class="uploaded-file-info" id="uploadedFileInfo">
+              <span class="file-name" id="uploadedFileName">logo.png</span>
+              <button class="remove-logo-btn" id="removeLogoBtn">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Logo Options (Advanced) -->
+          <div class="logo-options" id="logoOptionsPanel">
+            <div class="setting-row-grid mt-2">
+              <div class="setting-row">
+                <label class="setting-label sub-label">ขนาดรูปโลโก้</label>
+                <div class="range-with-val">
+                  <input type="range" id="logoSize" min="10" max="50" value="25">
+                  <span class="range-val" id="logoSizeVal">25%</span>
+                </div>
+              </div>
+              <div class="setting-row">
+                <label class="setting-label sub-label">ระยะเว้นรอบโลโก้ (Margin)</label>
+                <div class="range-with-val">
+                  <input type="range" id="logoMargin" min="0" max="30" value="6">
+                  <span class="range-val" id="logoMarginVal">6px</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="setting-row mt-2">
+              <label class="toggle-container">
+                <input type="checkbox" id="hideDotsBehind" checked>
+                <span class="toggle-slider"></span>
+                <span class="setting-label inline-label">ล้างลายคิวอาร์โค้ดด้านหลังโลโก้</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Right Panel: Preview & Actions -->
+      <section class="preview-panel">
+        
+        <!-- Quick Themes presets -->
+        <div class="presets-container glass-panel">
+          <label class="setting-label mb-2"><i data-lucide="sparkles"></i> ธีมสีสำเร็จรูปน่ารัก ๆ (Quick Themes)</label>
+          <div class="presets-row">
+            <button class="preset-badge" data-theme="strawberry" style="background: linear-gradient(135deg, #ff85a2, #ffb3c6); color: #fff;">🍓 สตรอเบอร์รี่</button>
+            <button class="preset-badge" data-theme="matcha" style="background: linear-gradient(135deg, #70e000, #9ef01a); color: #222;">🍵 มัทฉะลาเต้</button>
+            <button class="preset-badge" data-theme="ocean" style="background: linear-gradient(135deg, #4ea8de, #90e0ef); color: #fff;">🌊 โอเชี่ยนบลู</button>
+            <button class="preset-badge" data-theme="sunset" style="background: linear-gradient(135deg, #f77f00, #fcbf49); color: #fff;">🌅 ซันเซ็ตโกลว์</button>
+            <button class="preset-badge" data-theme="lavender" style="background: linear-gradient(135deg, #b388ff, #d500f9); color: #fff;">🦄 ลาเวนเดอร์</button>
+            <button class="preset-badge" data-theme="darkpastel" style="background: linear-gradient(135deg, #4a4e69, #9a8c98); color: #fff;">🕶️ เทาคลาสสิก</button>
+          </div>
+        </div>
+
+        <!-- Main Preview Card -->
+        <div class="preview-card glass-panel">
+          <div class="qr-container-outer">
+            <div id="qrPreviewCanvas" class="qr-preview-canvas">
+              <!-- QRCodeStyling will append its canvas here -->
+            </div>
+          </div>
+
+          <div class="qr-info-message">
+            <i data-lucide="info"></i>
+            <span>คิวอาร์โค้ดอัปเดตแบบเรียลไทม์ตามทุกการตั้งค่าของคุณ</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Export Settings -->
+          <div class="export-settings">
+            <div class="setting-row-grid">
+              <div class="setting-row">
+                <label class="setting-label">ฟอร์แมตไฟล์</label>
+                <div class="tab-selector" id="exportFormatSelector">
+                  <button class="tab-btn active" data-value="png">PNG</button>
+                  <button class="tab-btn" data-value="jpg">JPG</button>
+                  <button class="tab-btn" data-value="svg">SVG</button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <label class="setting-label">ขนาดดาวน์โหลด (พิกเซล)</label>
+                <select id="exportSize" class="cute-select">
+                  <option value="300">300 x 300 px</option>
+                  <option value="500" selected>500 x 500 px (แนะนำ)</option>
+                  <option value="1000">1000 x 1000 px</option>
+                  <option value="2000">2000 x 2000 px</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Download Action Buttons -->
+          <div class="action-buttons">
+            <button class="btn-download" id="downloadBtn">
+              <i data-lucide="download"></i>
+              <span>ดาวน์โหลดคิวอาร์โค้ด</span>
+            </button>
+            <button class="btn-secondary" id="copyBtn" title="คัดลอกรูปภาพไปที่คลิปบอร์ด">
+              <i data-lucide="copy"></i>
+              <span>คัดลอกรูป</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Narak QR Generator &copy; 2026 | สร้างคิวอาร์โค้ดกลมมนน่ารัก ๆ ได้ฟรี 💖</p>
+    </footer>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
