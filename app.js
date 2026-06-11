@@ -551,12 +551,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     ctx.strokeStyle = color;
 
-    // Line style (Solid vs Dashed)
+    // Line style (Solid vs Dashed vs Dotted)
     if (selectedFrameLineStyle === "dashed") {
       const dashLen = 8 * scale;
       const gapLen = 6 * scale;
+      ctx.lineCap = "butt";
       ctx.setLineDash([dashLen, gapLen]);
+    } else if (selectedFrameLineStyle === "dotted") {
+      ctx.lineCap = "round";
+      const gapLen = borderWidth * 2.0;
+      ctx.setLineDash([0.01, gapLen]);
     } else {
+      ctx.lineCap = "butt";
       ctx.setLineDash([]);
     }
 
