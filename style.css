@@ -98,6 +98,8 @@ body {
   filter: blur(80px);
   opacity: 0.65;
   animation: floatAround 25s infinite alternate ease-in-out;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 .blob-1 {

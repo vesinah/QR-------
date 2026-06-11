@@ -278,6 +278,15 @@ function svgToDataUrl(svgString) {
   return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
 }
 
+// Helper: Debounce function updates to prevent excessive render lag on rapid inputs
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
 // Global Application State
 let activeLogoDataUrl = "";
 let qrCode = null;
@@ -508,6 +517,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Create a debounced version of the update function for input-heavy operations (typing, sliding sliders)
+  const debouncedUpdateQRCode = debounce(updateQRCode, 60);
+
   // Draw styled outer border on canvas
   function drawBorder(canvas, scale) {
     if (selectedFrameType === "none") return;
@@ -632,7 +644,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Bind reactive events
 
   // Text inputs
-  qrTextInput.addEventListener("input", updateQRCode);
+  qrTextInput.addEventListener("input", debouncedUpdateQRCode);
   clearTextBtn.addEventListener("click", () => {
     qrTextInput.value = "";
     qrTextInput.focus();
@@ -677,7 +689,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function syncColorInput(picker, hexInput) {
     picker.addEventListener("input", (e) => {
       hexInput.value = e.target.value;
-      updateQRCode();
+      debouncedUpdateQRCode();
     });
     hexInput.addEventListener("input", (e) => {
       let val = e.target.value.trim();
@@ -687,7 +699,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (val.length === 7 && val.startsWith("#")) {
         picker.value = val;
-        updateQRCode();
+        debouncedUpdateQRCode();
       }
     });
   }
@@ -715,7 +727,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   gradientRotation.addEventListener("input", (e) => {
     gradRotVal.textContent = e.target.value + "°";
-    updateQRCode();
+    debouncedUpdateQRCode();
   });
 
   // Custom corners checkbox toggle
@@ -827,6 +839,9 @@ document.addEventListener("DOMContentLoaded", () => {
       
       updateQRCode();
     };
+    reader.onerror = () => {
+      alert("เกิดข้อผิดพลาดในการอ่านไฟล์รูปภาพ กรุณาลองใหม่อีกครั้งนะค้าา 🌸");
+    };
     reader.readAsDataURL(file);
   }
 
@@ -842,12 +857,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Logo Sliders
   logoSize.addEventListener("input", (e) => {
     logoSizeVal.textContent = e.target.value + "%";
-    updateQRCode();
+    debouncedUpdateQRCode();
   });
 
   logoMargin.addEventListener("input", (e) => {
     logoMarginVal.textContent = e.target.value + "px";
-    updateQRCode();
+    debouncedUpdateQRCode();
   });
 
   hideDotsBehind.addEventListener("change", updateQRCode);
@@ -871,7 +886,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   borderMarginSize.addEventListener("input", (e) => {
     borderMarginSizeVal.textContent = e.target.value + "px";
-    updateQRCode();
+    debouncedUpdateQRCode();
   });
 
   frameTypeSelector.addEventListener("click", (e) => {
@@ -902,7 +917,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   frameWidth.addEventListener("input", (e) => {
     frameWidthVal.textContent = e.target.value + "px";
-    updateQRCode();
+    debouncedUpdateQRCode();
   });
 
   inheritFrameColor.addEventListener("change", (e) => {
