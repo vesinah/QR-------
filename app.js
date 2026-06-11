@@ -425,9 +425,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const copyBtn = document.getElementById("copyBtn");
   const themeToggleBtn = document.getElementById("themeToggleBtn");
 
+  // Border & Frame DOM elements
+  const borderMarginMode = document.getElementById("borderMarginMode");
+  const borderMarginSizeRow = document.getElementById("borderMarginSizeRow");
+  const borderMarginSize = document.getElementById("borderMarginSize");
+  const borderMarginSizeVal = document.getElementById("borderMarginSizeVal");
+
+  const frameTypeSelector = document.getElementById("frameTypeSelector");
+  const frameOptionsPanel = document.getElementById("frameOptionsPanel");
+  const frameLineStyle = document.getElementById("frameLineStyle");
+  const frameWidth = document.getElementById("frameWidth");
+  const frameWidthVal = document.getElementById("frameWidthVal");
+
+  const inheritFrameColor = document.getElementById("inheritFrameColor");
+  const customFrameColorWrapper = document.getElementById("customFrameColorWrapper");
+  const frameColor = document.getElementById("frameColor");
+  const frameColorHex = document.getElementById("frameColorHex");
+
   // State values
   let selectedDotType = "extra-rounded";
   let activeFormat = "png";
+  let selectedBorderMarginMode = "flush";
+  let selectedFrameType = "none";
+  let selectedFrameLineStyle = "solid";
 
   // Create & mount the styling QR code instance
   qrCode = new QRCodeStyling({
@@ -468,8 +488,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Main QR Update function
   function updateQRCode() {
+    // 1. Calculate margin sizes at 300px scale
+    const userMargin = (selectedBorderMarginMode === "margin") ? parseInt(borderMarginSize.value, 10) : 0;
+    const borderWidth = (selectedFrameType !== "none") ? parseInt(frameWidth.value, 10) : 0;
+    const padding = 8;
+
+    let qrMarginAt300 = 0;
+    if (selectedBorderMarginMode === "margin") {
+      qrMarginAt300 = padding + borderWidth + userMargin;
+    } else {
+      if (selectedFrameType !== "none") {
+        qrMarginAt300 = padding + borderWidth;
+      } else {
+        qrMarginAt300 = 0;
+      }
+    }
+
     const config = {
       data: qrTextInput.value || " ", // empty space if cleared to prevent crash
+      width: 300,
+      height: 300,
+      margin: qrMarginAt300,
       backgroundOptions: {},
       qrOptions: {
         errorCorrectionLevel: "H"
@@ -537,7 +576,133 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    qrCode.update(config);
+    const updatePromise = qrCode.update(config);
+    if (updatePromise && typeof updatePromise.then === "function") {
+      updatePromise.then(() => {
+        const canvas = document.querySelector("#qrPreviewCanvas canvas");
+        if (canvas) drawBorder(canvas, 1);
+      });
+    } else {
+      setTimeout(() => {
+        const canvas = document.querySelector("#qrPreviewCanvas canvas");
+        if (canvas) drawBorder(canvas, 1);
+      }, 100);
+    }
+  }
+
+  // Draw styled outer border on canvas
+  function drawBorder(canvas, scale) {
+    if (selectedFrameType === "none") return;
+
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Get border parameters at 300px scale
+    const borderWidthAt300 = parseInt(frameWidth.value, 10);
+    const paddingAt300 = 8;
+
+    // Scale parameters
+    const borderWidth = borderWidthAt300 * scale;
+    const padding = paddingAt300 * scale;
+
+    // Border bounding box coordinates
+    const x1 = borderWidth / 2 + padding;
+    const y1 = borderWidth / 2 + padding;
+    const x2 = W - borderWidth / 2 - padding;
+    const y2 = H - borderWidth / 2 - padding;
+    const width = x2 - x1;
+    const height = y2 - y1;
+
+    ctx.save();
+    
+    // Set border line styles
+    ctx.lineWidth = borderWidth;
+    
+    // Resolve border color
+    let color = "#2b2d42";
+    if (inheritFrameColor.checked) {
+      const colorMode = document.querySelector("#colorModeSelector .tab-btn.active").dataset.value;
+      if (colorMode === "gradient") {
+        color = qrColorGradStart.value;
+      } else {
+        color = qrColorSingle.value;
+      }
+    } else {
+      color = frameColor.value;
+    }
+    ctx.strokeStyle = color;
+
+    // Line style (Solid vs Dashed)
+    if (selectedFrameLineStyle === "dashed") {
+      const dashLen = 8 * scale;
+      const gapLen = 6 * scale;
+      ctx.setLineDash([dashLen, gapLen]);
+    } else {
+      ctx.setLineDash([]);
+    }
+
+    ctx.beginPath();
+    if (selectedFrameType === "square") {
+      ctx.rect(x1, y1, width, height);
+    } else if (selectedFrameType === "rounded") {
+      const radius = 24 * scale;
+      ctx.roundRect(x1, y1, width, height, radius);
+    } else if (selectedFrameType === "twelve-indented") {
+      // Twelve-indented corners (ย่อมุมไม้สิบสอง)
+      const indent = Math.max(12 * scale, W * 0.07); // proportional indent
+      const s = indent / 3; // step size
+
+      // Start at top-middle
+      ctx.moveTo((x1 + x2) / 2, y1);
+
+      // Top-right corner steps
+      ctx.lineTo(x2 - indent, y1);
+      ctx.lineTo(x2 - indent + s, y1);
+      ctx.lineTo(x2 - indent + s, y1 + s);
+      ctx.lineTo(x2 - indent + 2 * s, y1 + s);
+      ctx.lineTo(x2 - indent + 2 * s, y1 + 2 * s);
+      ctx.lineTo(x2, y1 + 2 * s);
+      ctx.lineTo(x2, y1 + indent);
+
+      // Right side
+      ctx.lineTo(x2, y2 - indent);
+
+      // Bottom-right corner steps
+      ctx.lineTo(x2, y2 - indent + s);
+      ctx.lineTo(x2 - s, y2 - indent + s);
+      ctx.lineTo(x2 - s, y2 - indent + 2 * s);
+      ctx.lineTo(x2 - 2 * s, y2 - indent + 2 * s);
+      ctx.lineTo(x2 - 2 * s, y2);
+      ctx.lineTo(x2 - indent, y2);
+
+      // Bottom side
+      ctx.lineTo(x1 + indent, y2);
+
+      // Bottom-left corner steps
+      ctx.lineTo(x1 + indent - s, y2);
+      ctx.lineTo(x1 + indent - s, y2 - s);
+      ctx.lineTo(x1 + indent - 2 * s, y2 - s);
+      ctx.lineTo(x1 + indent - 2 * s, y2 - 2 * s);
+      ctx.lineTo(x1, y2 - 2 * s);
+      ctx.lineTo(x1, y2 - indent);
+
+      // Left side
+      ctx.lineTo(x1, y1 + indent);
+
+      // Top-left corner steps
+      ctx.lineTo(x1, y1 + indent - s);
+      ctx.lineTo(x1 + s, y1 + indent - s);
+      ctx.lineTo(x1 + s, y1 + indent - 2 * s);
+      ctx.lineTo(x1 + 2 * s, y1 + indent - 2 * s);
+      ctx.lineTo(x1 + 2 * s, y1);
+      ctx.lineTo(x1 + indent, y1);
+      
+      ctx.closePath();
+    }
+
+    ctx.stroke();
+    ctx.restore();
   }
 
   // Bind reactive events
@@ -609,6 +774,7 @@ document.addEventListener("DOMContentLoaded", () => {
   syncColorInput(cornerSquareColor, cornerSquareHex);
   syncColorInput(cornerDotColor, cornerDotHex);
   syncColorInput(qrBgColor, qrBgColorHex);
+  syncColorInput(frameColor, frameColorHex);
 
   // Gradient parameters
   gradientType.addEventListener("change", (e) => {
@@ -762,6 +928,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
   hideDotsBehind.addEventListener("change", updateQRCode);
 
+  // Borders & Frames Event Listeners
+  borderMarginMode.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-btn");
+    if (!btn) return;
+
+    borderMarginMode.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedBorderMarginMode = btn.dataset.value;
+
+    if (selectedBorderMarginMode === "margin") {
+      borderMarginSizeRow.style.display = "block";
+    } else {
+      borderMarginSizeRow.style.display = "none";
+    }
+    updateQRCode();
+  });
+
+  borderMarginSize.addEventListener("input", (e) => {
+    borderMarginSizeVal.textContent = e.target.value + "px";
+    updateQRCode();
+  });
+
+  frameTypeSelector.addEventListener("click", (e) => {
+    const card = e.target.closest(".sticker-card");
+    if (!card) return;
+
+    frameTypeSelector.querySelectorAll(".sticker-card").forEach(c => c.classList.remove("active"));
+    card.classList.add("active");
+    selectedFrameType = card.dataset.frame;
+
+    if (selectedFrameType !== "none") {
+      frameOptionsPanel.classList.add("active");
+    } else {
+      frameOptionsPanel.classList.remove("active");
+    }
+    updateQRCode();
+  });
+
+  frameLineStyle.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-btn");
+    if (!btn) return;
+
+    frameLineStyle.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedFrameLineStyle = btn.dataset.value;
+    updateQRCode();
+  });
+
+  frameWidth.addEventListener("input", (e) => {
+    frameWidthVal.textContent = e.target.value + "px";
+    updateQRCode();
+  });
+
+  inheritFrameColor.addEventListener("change", (e) => {
+    if (e.target.checked) {
+      customFrameColorWrapper.style.display = "none";
+    } else {
+      customFrameColorWrapper.style.display = "block";
+    }
+    updateQRCode();
+  });
+
   // Preset themes activation
   presetsRow.addEventListener("click", (e) => {
     const btn = e.target.closest(".preset-badge");
@@ -834,6 +1062,33 @@ document.addEventListener("DOMContentLoaded", () => {
     qrBgColor.closest(".color-picker-wrapper").style.opacity = theme.transparentBg ? "0.5" : "1";
     qrBgColor.closest(".color-picker-wrapper").style.pointerEvents = theme.transparentBg ? "none" : "all";
 
+    // Reset borders and frames on preset change
+    selectedBorderMarginMode = "flush";
+    borderMarginMode.querySelectorAll(".tab-btn").forEach(b => {
+      if (b.dataset.value === "flush") b.classList.add("active");
+      else b.classList.remove("active");
+    });
+    borderMarginSizeRow.style.display = "none";
+    borderMarginSize.value = 20;
+    borderMarginSizeVal.textContent = "20px";
+
+    selectedFrameType = "none";
+    frameTypeSelector.querySelectorAll(".sticker-card").forEach(c => {
+      if (c.dataset.frame === "none") c.classList.add("active");
+      else c.classList.remove("active");
+    });
+    frameOptionsPanel.classList.remove("active");
+    
+    selectedFrameLineStyle = "solid";
+    frameLineStyle.querySelectorAll(".tab-btn").forEach(b => {
+      if (b.dataset.value === "solid") b.classList.add("active");
+      else b.classList.remove("active");
+    });
+    frameWidth.value = 3;
+    frameWidthVal.textContent = "3px";
+    inheritFrameColor.checked = true;
+    customFrameColorWrapper.style.display = "none";
+
     updateQRCode();
   });
 
@@ -876,14 +1131,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const size = parseInt(exportSize.value, 10);
     
     try {
+      // Calculate scaled margin
+      const userMargin = (selectedBorderMarginMode === "margin") ? parseInt(borderMarginSize.value, 10) : 0;
+      const borderWidth = (selectedFrameType !== "none") ? parseInt(frameWidth.value, 10) : 0;
+      const padding = 8;
+
+      let qrMarginAt300 = 0;
+      if (selectedBorderMarginMode === "margin") {
+        qrMarginAt300 = padding + borderWidth + userMargin;
+      } else {
+        if (selectedFrameType !== "none") {
+          qrMarginAt300 = padding + borderWidth;
+        } else {
+          qrMarginAt300 = 0;
+        }
+      }
+
+      const scale = size / 300;
+      const scaledMargin = Math.round(qrMarginAt300 * scale);
+
       // 1. Temporarily increase width/height for high resolution download
-      qrCode.update({
+      const updatePromise = qrCode.update({
         width: size,
-        height: size
+        height: size,
+        margin: scaledMargin
       });
 
-      // Wait a short tick for canvas update
-      await new Promise(resolve => setTimeout(resolve, 250));
+      if (updatePromise && typeof updatePromise.then === "function") {
+        await updatePromise;
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 250));
+      }
+
+      // Draw border at high resolution scale
+      const canvas = document.querySelector("#qrPreviewCanvas canvas");
+      if (canvas) {
+        drawBorder(canvas, scale);
+      }
 
       // 2. Trigger download
       await qrCode.download({
@@ -895,10 +1179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("เกิดข้อผิดพลาดในการดาวน์โหลดรูปภาพ");
     } finally {
       // 3. Restore back to screen layout size
-      qrCode.update({
-        width: 300,
-        height: 300
-      });
+      updateQRCode();
       downloadBtn.innerHTML = originalText;
       lucide.createIcons();
     }

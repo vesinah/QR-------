@@ -357,6 +357,92 @@
           </div>
         </div>
 
+        <!-- Section 5: Borders & Frames -->
+        <div class="config-section">
+          <h2 class="section-title">
+            <span class="step-num">5</span>
+            <i data-lucide="frame"></i>
+            ขอบและกรอบคิวอาร์โค้ด (Borders & Frames)
+          </h2>
+          
+          <!-- Border Margin Mode -->
+          <div class="setting-row">
+            <label class="setting-label">ระยะขอบรอบคิวอาร์โค้ด</label>
+            <div class="tab-selector" id="borderMarginMode">
+              <button class="tab-btn active" data-value="flush">ชิดขอบ (Flush)</button>
+              <button class="tab-btn" data-value="margin">เว้นขอบขาว (Margin)</button>
+            </div>
+          </div>
+          
+          <!-- Margin Size Slider (Hidden when flush) -->
+          <div class="setting-row" id="borderMarginSizeRow" style="display: none;">
+            <label class="setting-label sub-label">ระยะความกว้างของขอบขาว</label>
+            <div class="range-with-val">
+              <input type="range" id="borderMarginSize" min="10" max="80" value="20">
+              <span class="range-val" id="borderMarginSizeVal">20px</span>
+            </div>
+          </div>
+
+          <!-- Outer Frame Type -->
+          <div class="setting-row border-top pt-3">
+            <label class="setting-label">รูปแบบกรอบด้านนอก (Outer Frame)</label>
+            <div class="sticker-grid" id="frameTypeSelector">
+              <div class="sticker-card active" data-frame="none">
+                <div class="sticker-preview">🚫</div>
+                <span>ไม่มีกรอบ</span>
+              </div>
+              <div class="sticker-card" data-frame="square">
+                <div class="sticker-preview">🔲</div>
+                <span>กรอบเหลี่ยม</span>
+              </div>
+              <div class="sticker-card" data-frame="rounded">
+                <div class="sticker-preview">⭕</div>
+                <span>กรอบมน</span>
+              </div>
+              <div class="sticker-card" data-frame="twelve-indented">
+                <div class="sticker-preview">🏛️</div>
+                <span>ย่อมุมไม้สิบสอง</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Frame Customization Options (Hidden when no frame) -->
+          <div class="frame-options-panel" id="frameOptionsPanel" style="display: none;">
+            <div class="setting-row-grid mt-2">
+              <div class="setting-row">
+                <label class="setting-label sub-label">สไตล์เส้นขอบ</label>
+                <div class="tab-selector" id="frameLineStyle">
+                  <button class="tab-btn active" data-value="solid">เส้นทึบ</button>
+                  <button class="tab-btn" data-value="dashed">เส้นประ</button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <label class="setting-label sub-label">ความหนาเส้นขอบ</label>
+                <div class="range-with-val">
+                  <input type="range" id="frameWidth" min="1" max="15" value="3">
+                  <span class="range-val" id="frameWidthVal">3px</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-row mt-3 border-top pt-2">
+              <label class="toggle-container">
+                <input type="checkbox" id="inheritFrameColor" checked>
+                <span class="toggle-slider"></span>
+                <span class="setting-label inline-label">ใช้สีเดียวกับคิวอาร์โค้ด</span>
+              </label>
+            </div>
+
+            <div class="color-picker-wrapper mt-2" id="customFrameColorWrapper" style="display: none;">
+              <label class="setting-label sub-label">ระบุสีเส้นขอบ</label>
+              <div class="picker-container">
+                <input type="color" id="frameColor" value="#2b2d42">
+                <input type="text" id="frameColorHex" class="hex-input" value="#2b2d42">
+              </div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       <!-- Right Panel: Preview & Actions -->
